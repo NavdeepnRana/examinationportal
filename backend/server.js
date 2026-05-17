@@ -7,6 +7,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const ensureAdmin = require('./utils/ensureAdmin');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
@@ -19,6 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 connectDB()
+  .then(() => ensureAdmin())
   .then(() => console.log('Database ready'))
   .catch((err) => {
     console.error('MongoDB connection failed:', err.message);

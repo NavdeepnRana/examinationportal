@@ -1,25 +1,26 @@
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+const path = require('path');
+const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const User = require('../models/User');
+const ensureAdmin = require('../utils/ensureAdmin');
+
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const seed = async () => {
-  const uri = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/examinationportal';
-  await mongoose.connect(uri);
+  const uri =
+    process.env.MONGO_URI ||
+    process.env.MONGODB_URI ||
+    'mongodb://localhost:27017/examinationportal';
 
-  const exists = await User.findOne({ email: 'admin@portal.com' });
-  if (exists) {
-    console.log('Admin already exists: admin@portal.com');
-  } else {
-    await User.create({
-      name: 'System Admin',
-      email: 'admin@portal.com',
-      password: 'admin123',
-      role: 'admin',
-    });
-    console.log('Admin created: admin@portal.com / admin123');
-  }
+  await mongoose.connect(uri);
+  console.log('Connected to MongoDB');
+
+  await ensureAdmin();
 
   await mongoose.disconnect();
+  console.log('Seed complete.');
 };
 
-seed().catch(console.error);
+seed().catch((err) => {
+  console.error('Seed failed:', err.message);
+  process.exit(1);
+});
