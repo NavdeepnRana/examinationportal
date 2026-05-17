@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const seed = async () => {
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/examinationportal');
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/examinationportal';
+  await mongoose.connect(uri);
 
   const exists = await User.findOne({ email: 'admin@portal.com' });
   if (exists) {
